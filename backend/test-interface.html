@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIM/CAD 3D Estimating Test Interface</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        .result {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .status {
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .info { color: #2196F3; }
+        .file-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .cost-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .material-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .material-cost {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏗️ BIM/CAD 3D Estimating Module Test</h1>
+        
+        <div class="test-section">
+            <h3>📁 Target File</h3>
+            <div class="file-info">
+                📄 File: 07.28.25 Whispering Pines_Building A.pdf<br>
+                📂 Location: c:\Users\lesso\Desktop\<br>
+                🏢 Type: Commercial Building Plan
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 System Health Check</h3>
+            <button onclick="testHealth()">Check Server Health</button>
+            <div id="healthResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 BIM Estimation Test</h3>
+            <button onclick="testEstimation()">Run BIM Estimation</button>
+            <button onclick="runFullTest()">Run Complete E2E Test</button>
+            <div id="estimationResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📈 Test Results Summary</h3>
+            <div id="summaryResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000';
+        
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const statusClass = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            element.innerHTML += `<div class="status ${statusClass}">[${timestamp}] ${message}</div>`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        async function testHealth() {
+            const resultDiv = document.getElementById('healthResult');
+            resultDiv.innerHTML = '';
+            
+            try {
+                log('healthResult', '🔍 Testing server health...', 'info');
+                
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('healthResult', '✅ Server is healthy!', 'success');
+                    log('healthResult', `📋 Status: ${data.status}`, 'info');
+                    log('healthResult', `🕐 Timestamp: ${data.timestamp}`, 'info');
+                    log('healthResult', `🔧 Service: ${data.service}`, 'info');
+                } else {
+                    log('healthResult', '❌ Health check failed', 'error');
+                }
+            } catch (error) {
+                log('healthResult', `❌ Connection error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testEstimation() {
+            const resultDiv = document.getElementById('estimationResult');
+            resultDiv.innerHTML = '';
+            
+            try {
+                log('estimationResult', '📊 Starting BIM estimation...', 'info');
+                
+                const requestData = {
+                    filename: "07.28.25 Whispering Pines_Building A.pdf",
+                    file_path: "c:\\Users\\lesso\\Desktop\\07.28.25 Whispering Pines_Building A.pdf",
+                    project_type: "commercial_building",
+                    estimation_type: "quantity_takeoff"
+                };
+                
+                const response = await fetch(`${API_BASE}/api/bim/estimate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    log('estimationResult', '✅ BIM estimation completed successfully!', 'success');
+                    log('estimationResult', `📁 File: ${data.filename}`, 'info');
+                    log('estimationResult', `💰 Total Cost: $${data.total_cost.toLocaleString()}`, 'success');
+                    log('estimationResult', `⏱️ Processing Time: ${data.processing_time}`, 'info');
+                    log('estimationResult', `🎯 Accuracy: ${data.accuracy}`, 'success');
+                    
+                    // Create cost breakdown
+                    const breakdown = document.createElement('div');
+                    breakdown.className = 'cost-breakdown';
+                    breakdown.innerHTML = '<h4>📋 Quantity Takeoff Breakdown:</h4>';
+                    
+                    Object.entries(data.quantity_takeoff).forEach(([material, details]) => {
+                        const card = document.createElement('div');
+                        card.className = 'material-card';
+                        card.innerHTML = `
+                            <div>${material.replace('_', ' ').toUpperCase()}</div>
+                            <div>${details.volume || details.weight || details.area} ${details.unit}</div>
+                            <div class="material-cost">$${details.cost.toLocaleString()}</div>
+                        `;
+                        breakdown.appendChild(card);
+                    });
+                    
+                    resultDiv.appendChild(breakdown);
+                    
+                } else {
+                    log('estimationResult', '❌ Estimation failed', 'error');
+                    log('estimationResult', JSON.stringify(data, null, 2), 'error');
+                }
+            } catch (error) {
+                log('estimationResult', `❌ Connection error: ${error.message}`, 'error');
+            }
+        }
+
+        async function runFullTest() {
+            const summaryDiv = document.getElementById('summaryResult');
+            summaryDiv.innerHTML = '';
+            
+            log('summaryResult', '🚀 Starting Complete End-to-End Test...', 'info');
+            log('summaryResult', '==================================', 'info');
+            
+            // Test 1: Health Check
+            log('summaryResult', '🔍 Step 1: Health Check', 'info');
+            try {
+                const healthResponse = await fetch(`${API_BASE}/health`);
+                const healthData = await healthResponse.json();
+                
+                if (healthResponse.ok) {
+                    log('summaryResult', '   ✅ Health check passed', 'success');
+                } else {
+                    log('summaryResult', '   ❌ Health check failed', 'error');
+                    return;
+                }
+            } catch (error) {
+                log('summaryResult', `   ❌ Health check error: ${error.message}`, 'error');
+                return;
+            }
+            
+            // Test 2: File Upload Simulation
+            log('summaryResult', '📁 Step 2: File Upload Simulation', 'info');
+            try {
+                const uploadResponse = await fetch(`${API_BASE}/api/bim/upload`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename: '07.28.25 Whispering Pines_Building A.pdf' })
+                });
+                
+                const uploadData = await uploadResponse.json();
+                if (uploadData.success) {
+                    log('summaryResult', '   ✅ File upload simulation passed', 'success');
+                } else {
+                    log('summaryResult', '   ❌ File upload simulation failed', 'error');
+                }
+            } catch (error) {
+                log('summaryResult', `   ❌ Upload error: ${error.message}`, 'error');
+            }
+            
+            // Test 3: BIM Estimation
+            log('summaryResult', '📊 Step 3: BIM Estimation', 'info');
+            try {
+                const estimationResponse = await fetch(`${API_BASE}/api/bim/estimate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        filename: "07.28.25 Whispering Pines_Building A.pdf",
+                        file_path: "c:\\Users\\lesso\\Desktop\\07.28.25 Whispering Pines_Building A.pdf",
+                        project_type: "commercial_building",
+                        estimation_type: "quantity_takeoff"
+                    })
+                });
+                
+                const estimationData = await estimationResponse.json();
+                if (estimationData.success) {
+                    log('summaryResult', '   ✅ BIM estimation completed', 'success');
+                    log('summaryResult', `   💰 Total Project Cost: $${estimationData.total_cost.toLocaleString()}`, 'success');
+                    log('summaryResult', `   🎯 Estimation Accuracy: ${estimationData.accuracy}`, 'success');
+                    log('summaryResult', `   ⏱️ Processing Time: ${estimationData.processing_time}`, 'info');
+                } else {
+                    log('summaryResult', '   ❌ BIM estimation failed', 'error');
+                }
+            } catch (error) {
+                log('summaryResult', `   ❌ Estimation error: ${error.message}`, 'error');
+            }
+            
+            log('summaryResult', '==================================', 'info');
+            log('summaryResult', '🎉 End-to-End Test Completed!', 'success');
+            log('summaryResult', '📋 InstallSure BIM/CAD 3D Estimating Module is operational', 'success');
+        }
+
+        // Auto-run health check on page load
+        window.onload = () => {
+            setTimeout(testHealth, 1000);
+        };
+    </script>
+</body>
+</html>

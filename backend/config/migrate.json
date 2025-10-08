@@ -1,0 +1,5 @@
+{
+  "migrationsDirectory": "migrations",
+  "connectionString": "postgres://user:pass@localhost:5432/installsure",
+  "ssl": false
+}

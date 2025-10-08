@@ -1,0 +1,152 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: installsure-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: installsure
+      POSTGRES_USER: installsure
+      POSTGRES_PASSWORD: dev_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U installsure"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: installsure-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Node.js Backend API
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: installsure-backend
+    ports:
+      - "8080:8080"
+    environment:
+      NODE_ENV: development
+      PORT: 8080
+      DATABASE_URL: postgresql://installsure:dev_password@postgres:5432/installsure
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: your_jwt_secret_minimum_32_characters_long
+      JWT_REFRESH_SECRET: your_refresh_secret_minimum_32_characters
+      CORS_ORIGIN: http://localhost:5173
+      BIM_SERVICE_URL: http://bim:8000
+      UPLOAD_PATH: /app/uploads
+      MAX_FILE_SIZE: 104857600
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Python BIM Processing Service
+  bim:
+    build: 
+      context: ./bim
+      dockerfile: Dockerfile
+    container_name: installsure-bim
+    ports:
+      - "8000:8000"
+    environment:
+      PYTHON_ENV: development
+      PORT: 8000
+      REDIS_URL: redis://redis:6379
+      LLM_ENABLED: true
+      LLM_PROVIDER: ollama
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      CACHE_TTL: 3600
+    volumes:
+      - ./bim:/app
+      - uploads:/app/uploads
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # React Frontend
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: installsure-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:8080
+      VITE_BIM_API_URL: http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+      - bim
+
+  # Optional: Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: installsure-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - backend
+      - bim
+    profiles:
+      - production
+
+  # Optional: Ollama LLM Service
+  ollama:
+    image: ollama/ollama:latest
+    container_name: installsure-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    profiles:
+      - ai
+
+volumes:
+  postgres_data:
+  redis_data:
+  uploads:
+  ollama_data:
+
+networks:
+  default:
+    name: installsure-network
