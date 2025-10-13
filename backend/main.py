@@ -1,53 +1,30 @@
-from __future__ import annotations
-
-import os
-import shutil
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import List
-
-from dotenv import load_dotenv
-from fastapi import FastAPI, File, UploadFile, HTTPException, status
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from src.core.logging import setup_logging
+from src.api import auth, files, projects, qto, drone
 
-from bim_processor import process_pdf
-
-# Load .env
-load_dotenv()
-
-API_HOST = os.getenv("API_HOST", "0.0.0.0")
-API_PORT = int(os.getenv("API_PORT", "8000"))
-API_RELOAD = os.getenv("API_RELOAD", "true").lower() == "true"
-APP_VERSION = os.getenv("APP_VERSION", "2.0.0")
-
-# Parse CORS origins
-_raw_origins = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
-CORS_ORIGINS: List[str] = [o.strip() for o in _raw_origins if o.strip()]
-
-MAX_FILE_SIZE = int(os.getenv("MAX_FILE_SIZE", str(50 * 1024 * 1024)))
-UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", "./uploads")).resolve()
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-
-ALLOWED_EXTS = {".pdf"}  # For now we only truly support PDF
-
-app = FastAPI(title="InstallSure API", version=APP_VERSION)
-
+app = FastAPI(title="InstallSure API", version="2.0.0")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
-class ServiceStatus(BaseModel):
-    api: str = "operational"
-    bim_processor: str = "operational"
-    upload_service: str = "operational"
+setup_logging()
 
-class HealthPayload(BaseModel):
+
+@app.get("/healthz")
+def healthz():
+    return {"status": "ok"}
+
+
+app.include_router(auth.router, prefix="/auth", tags=["auth"])
+app.include_router(projects.router, prefix="/projects", tags=["projects"])
+app.include_router(files.router, prefix="/files", tags=["files"])
+app.include_router(qto.router, prefix="/qto", tags=["qto"])
+app.include_router(drone.router, prefix="/drone", tags=["drone"])
     status: str
     timestamp: str
     version: str
