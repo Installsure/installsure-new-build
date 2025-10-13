@@ -25,8 +25,6 @@ export async function registerRagRoutes(app: FastifyInstance) {
     '/api/rag/search',
     {
       schema: {
-        description: 'Search using RAG with citations and provenance',
-        tags: ['rag'],
         body: {
           type: 'object',
           required: ['query'],
@@ -56,7 +54,7 @@ export async function registerRagRoutes(app: FastifyInstance) {
         const result = await answer_with_citations(query, top_k);
         return reply.send(result);
       } catch (error) {
-        request.log.error({ error }, 'RAG search failed');
+        (request.log as any).error({ error }, 'RAG search failed');
         return reply.status(500).send({
           error: 'Search failed',
           message: error instanceof Error ? error.message : 'Unknown error'
@@ -70,8 +68,6 @@ export async function registerRagRoutes(app: FastifyInstance) {
     '/api/rag/index',
     {
       schema: {
-        description: 'Index a document for RAG retrieval',
-        tags: ['rag'],
         body: {
           type: 'object',
           required: ['doc_id', 'content'],
@@ -104,7 +100,7 @@ export async function registerRagRoutes(app: FastifyInstance) {
           chunks_indexed: chunks_count
         });
       } catch (error) {
-        request.log.error({ error }, 'Document indexing failed');
+        (request.log as any).error({ error }, 'Document indexing failed');
         return reply.status(500).send({
           error: 'Indexing failed',
           message: error instanceof Error ? error.message : 'Unknown error'
@@ -118,8 +114,6 @@ export async function registerRagRoutes(app: FastifyInstance) {
     '/api/rag/health',
     {
       schema: {
-        description: 'RAG service health check',
-        tags: ['rag'],
         response: {
           200: {
             type: 'object',

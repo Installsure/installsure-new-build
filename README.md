@@ -100,11 +100,20 @@ installsure/
 └── docker-compose.yml      # Multi-service orchestration
 ```
 
-### 🔧 Development Scripts
+### 🔧 Development Scripts & Build System
+- ✅ `Makefile` - Modern build system with LLM/RAG targets
 - ✅ `scripts/dev.ps1` - Complete development environment startup
 - ✅ `scripts/build.ps1` - Production build script
 - ✅ `scripts/test.ps1` - Comprehensive testing
 - ✅ `scripts/db-reset.ps1` - Database reset utility
+
+**New Makefile Targets:**
+- `make dev` - Start development environment
+- `make llm` - Start LLM/RAG stack with vector DB
+- `make test` - Run tests with coverage gates
+- `make scan` - Security scanning (bandit, SBOM)
+- `make release` - Build production images with SLSA provenance
+- `make seed` - Seed demo data and embeddings
 
 ### 🐳 Docker Configuration
 - ✅ Multi-service docker-compose setup
@@ -137,6 +146,13 @@ installsure/
 - numpy/pandas (data processing)
 - Redis (caching)
 
+#### LLM/RAG Services (NEW)
+- pgvector (vector embeddings storage)
+- Redis (semantic caching)
+- TypeScript RAG service (retrieval-augmented generation)
+- Embeddings pipeline
+- Groundedness & latency evaluations
+
 #### Frontend
 - React 18 with TypeScript
 - React Router (navigation)
@@ -156,10 +172,13 @@ installsure/
 
 2. **Development Mode**:
    ```bash
-   # Windows PowerShell
+   # Using new Makefile (recommended)
+   make dev
+   
+   # Or using PowerShell script
    .\scripts\dev.ps1
    
-   # Linux/Mac
+   # Or Linux/Mac
    ./scripts/dev.sh
    ```
 
@@ -167,6 +186,14 @@ installsure/
    - Frontend: http://localhost:5173
    - Backend API: http://localhost:8080
    - BIM Service: http://localhost:8000
+
+4. **Optional: Start LLM/RAG Stack** (NEW):
+   ```bash
+   make llm          # Start vector DB and run migrations
+   make seed         # Seed demo data and embeddings
+   ```
+
+   See [LLM_RAG_GUIDE.md](./LLM_RAG_GUIDE.md) for detailed LLM/RAG documentation.
 
 ## 📊 API Endpoints
 
@@ -194,6 +221,11 @@ installsure/
 - `POST /tasks` - Create task
 - `PUT /tasks/:id` - Update task
 - `DELETE /tasks/:id` - Delete task
+
+### RAG/LLM Endpoints (NEW)
+- `POST /api/rag/search` - Search with RAG (returns answer + citations)
+- `POST /api/rag/index` - Index a document for retrieval
+- `GET /api/rag/health` - RAG service health check
 
 ## 🏗️ Construction Management Features
 
@@ -238,6 +270,9 @@ installsure/
 - CORS protection
 - Helmet security headers
 - Password hashing with bcrypt
+- **NEW**: Automated security scanning (Bandit, npm audit)
+- **NEW**: SBOM generation for supply chain security
+- **NEW**: SLSA provenance for build integrity
 
 ## 📈 Performance Features
 - Redis caching for BIM data
@@ -245,6 +280,29 @@ installsure/
 - Database indexing and optimization
 - Connection pooling
 - Efficient file handling
+- **NEW**: Semantic caching for LLM responses (3600s TTL)
+- **NEW**: Vector embeddings for fast semantic search
+- **NEW**: Latency monitoring with p95 tracking
+
+## 🤖 LLM/RAG Features (NEW)
+- Retrieval-Augmented Generation (RAG) for contextual answers
+- Citation tracking and provenance
+- Semantic caching with Redis
+- Vector embeddings storage (pgvector)
+- Document indexing and chunking
+- Groundedness evaluation (≥85% hit rate)
+- Latency evaluation (p95 ≤ 2.5s)
+- Token usage tracking and budget alerts
+- Factual requirement enforcement
+
+## 🔄 CI/CD Pipeline (NEW)
+- **Lint & Type Check**: ESLint, TypeScript strict mode, Ruff for Python
+- **Tests**: Jest/Vitest with ≥80% coverage gate
+- **Security Scanning**: Bandit for Python, npm audit for Node.js
+- **Evaluations**: Groundedness and latency tests for RAG quality
+- **SBOM Generation**: Automated supply chain tracking
+- **Docker Build**: Multi-stage builds with caching
+- **VS Code Integration**: Tasks for dev, test, LLM, security workflows
 
 ---
 
