@@ -4,6 +4,20 @@
 
 This is a comprehensive rebuild of InstallSure as an enterprise-grade construction management platform with multi-service architecture.
 
+## 🤝 3-Tier Collaborative Development
+
+InstallSure uses a **3-tier team approach** for collaborative development:
+
+- **🏗️ Tier 1 (Infrastructure)**: Project structure, build configuration, Docker, database schema
+- **💼 Tier 2 (Implementation)**: Feature development, API endpoints, business logic, UI components
+- **🛡️ Tier 3 (Quality Assurance)**: Code review, testing, documentation, security audits
+
+**New Contributors**: Please read our collaboration guides:
+- [TEAM_WORKFLOW.md](./TEAM_WORKFLOW.md) - Understanding the 3-tier collaborative process
+- [BUILD_GUIDANCE.md](./BUILD_GUIDANCE.md) - Detailed specifications for each tier
+- [REVIEW_CHECKLIST.md](./REVIEW_CHECKLIST.md) - Code review standards and checklists
+- [CONTRIBUTING.md](./CONTRIBUTING.md) - How to contribute to the project
+
 ## 📋 What's Included
 
 ### 🎯 Core Architecture
