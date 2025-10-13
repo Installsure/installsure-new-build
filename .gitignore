@@ -1,0 +1,71 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.Python
+venv/
+env/
+ENV/
+
+# Build artifacts
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/*
+!.vscode/tasks.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Database
+*.db
+*.sqlite
+postgres_data/
+postgres_vector_data/
+qdrant_data/
+weaviate_data/
+
+# Uploads & temp files
+uploads/
+tmp/
+/tmp/
+*.tmp
+
+# Test output
+test-results/
+playwright-report/
+.nyc_output/
+
+# Security reports
+bandit-report.json
+sbom.json
+/tmp/bandit-report.json
+/tmp/sbom.json
+
+# Docker volumes
+ollama_data/
+
+# Redis dumps
+dump.rdb
