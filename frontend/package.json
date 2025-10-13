@@ -10,7 +10,8 @@
     "test:coverage": "vitest --coverage",
     "test:e2e": "playwright test",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "lint:fix": "eslint . --ext ts,tsx --fix"
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "generate:api": "openapi-typescript http://localhost:8080/api/openapi.json -o src/types/api-generated.ts"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -26,11 +27,15 @@
     "@headlessui/react": "^1.7.17",
     "recharts": "^2.8.0",
     "react-big-calendar": "^1.8.5",
-    "react-dropzone": "^14.2.3"
+    "react-dropzone": "^14.2.3",
+    "web-ifc": "^0.0.51",
+    "web-ifc-three": "^0.0.126",
+    "three": "^0.160.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.46",
     "@types/react-dom": "^18.2.18",
+    "@types/three": "^0.160.0",
     "@vitejs/plugin-react": "^4.2.1",
     "vite": "^5.0.10",
     "typescript": "^5.3.3",
@@ -45,6 +50,7 @@
     "@testing-library/react": "^14.1.2",
     "@testing-library/jest-dom": "^6.1.6",
     "@testing-library/user-event": "^14.5.2",
-    "@playwright/test": "^1.40.0"
+    "@playwright/test": "^1.40.0",
+    "openapi-typescript": "^6.7.4"
   }
 }

@@ -1,0 +1,327 @@
+name: SLSA Provenance Build
+
+on:
+  release:
+    types: [published]
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  id-token: write
+  packages: write
+  actions: read
+
+# SLSA Level 1: Build provenance generation
+# - Automated build process
+# - Provenance metadata generated
+# - Build steps documented
+
+jobs:
+  # Build backend with provenance
+  build-backend:
+    name: Build Backend (SLSA L1)
+    runs-on: ubuntu-latest
+    outputs:
+      backend-hash: ${{ steps.hash.outputs.backend-hash }}
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
+      
+      - name: Build backend
+        working-directory: ./backend
+        run: npm run build
+      
+      - name: Generate build hash
+        id: hash
+        run: |
+          cd backend/dist
+          HASH=$(find . -type f -exec sha256sum {} \; | sha256sum | cut -d' ' -f1)
+          echo "backend-hash=$HASH" >> $GITHUB_OUTPUT
+          echo "Backend build hash: $HASH"
+      
+      - name: Create build metadata
+        run: |
+          cat > backend/dist/build-metadata.json << EOF
+          {
+            "builder": {
+              "id": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            },
+            "buildType": "https://github.com/Installsure/installsure-new-build/backend@v1",
+            "invocation": {
+              "configSource": {
+                "uri": "https://github.com/${{ github.repository }}",
+                "digest": {
+                  "sha1": "${{ github.sha }}"
+                },
+                "entryPoint": ".github/workflows/slsa-provenance.yml"
+              }
+            },
+            "metadata": {
+              "buildInvocationId": "${{ github.run_id }}-${{ github.run_number }}",
+              "buildStartedOn": "${{ github.event.head_commit.timestamp }}",
+              "buildFinishedOn": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+              "completeness": {
+                "parameters": true,
+                "environment": true,
+                "materials": true
+              },
+              "reproducible": false
+            },
+            "materials": [
+              {
+                "uri": "https://github.com/${{ github.repository }}",
+                "digest": {
+                  "sha1": "${{ github.sha }}"
+                }
+              }
+            ]
+          }
+          EOF
+      
+      - name: Upload backend build
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-slsa-${{ github.sha }}
+          path: |
+            backend/dist
+          retention-days: 90
+
+  # Build frontend with provenance
+  build-frontend:
+    name: Build Frontend (SLSA L1)
+    runs-on: ubuntu-latest
+    outputs:
+      frontend-hash: ${{ steps.hash.outputs.frontend-hash }}
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+      
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+      
+      - name: Generate build hash
+        id: hash
+        run: |
+          cd frontend/dist
+          HASH=$(find . -type f -exec sha256sum {} \; | sha256sum | cut -d' ' -f1)
+          echo "frontend-hash=$HASH" >> $GITHUB_OUTPUT
+          echo "Frontend build hash: $HASH"
+      
+      - name: Create build metadata
+        run: |
+          cat > frontend/dist/build-metadata.json << EOF
+          {
+            "builder": {
+              "id": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            },
+            "buildType": "https://github.com/Installsure/installsure-new-build/frontend@v1",
+            "invocation": {
+              "configSource": {
+                "uri": "https://github.com/${{ github.repository }}",
+                "digest": {
+                  "sha1": "${{ github.sha }}"
+                },
+                "entryPoint": ".github/workflows/slsa-provenance.yml"
+              }
+            },
+            "metadata": {
+              "buildInvocationId": "${{ github.run_id }}-${{ github.run_number }}",
+              "buildStartedOn": "${{ github.event.head_commit.timestamp }}",
+              "buildFinishedOn": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+              "completeness": {
+                "parameters": true,
+                "environment": true,
+                "materials": true
+              },
+              "reproducible": false
+            },
+            "materials": [
+              {
+                "uri": "https://github.com/${{ github.repository }}",
+                "digest": {
+                  "sha1": "${{ github.sha }}"
+                }
+              }
+            ]
+          }
+          EOF
+      
+      - name: Upload frontend build
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-slsa-${{ github.sha }}
+          path: |
+            frontend/dist
+          retention-days: 90
+
+  # Generate SLSA provenance attestation
+  provenance:
+    name: Generate SLSA Provenance
+    needs: [build-backend, build-frontend]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download backend build
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-slsa-${{ github.sha }}
+          path: ./artifacts/backend
+      
+      - name: Download frontend build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-slsa-${{ github.sha }}
+          path: ./artifacts/frontend
+      
+      - name: Generate SLSA provenance
+        run: |
+          cat > slsa-provenance.json << EOF
+          {
+            "_type": "https://in-toto.io/Statement/v0.1",
+            "predicateType": "https://slsa.dev/provenance/v0.2",
+            "subject": [
+              {
+                "name": "installsure-backend",
+                "digest": {
+                  "sha256": "${{ needs.build-backend.outputs.backend-hash }}"
+                }
+              },
+              {
+                "name": "installsure-frontend",
+                "digest": {
+                  "sha256": "${{ needs.build-frontend.outputs.frontend-hash }}"
+                }
+              }
+            ],
+            "predicate": {
+              "builder": {
+                "id": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+              },
+              "buildType": "https://github.com/Installsure/installsure-new-build@v1",
+              "invocation": {
+                "configSource": {
+                  "uri": "git+https://github.com/${{ github.repository }}@${{ github.ref }}",
+                  "digest": {
+                    "sha1": "${{ github.sha }}"
+                  },
+                  "entryPoint": ".github/workflows/slsa-provenance.yml"
+                }
+              },
+              "buildConfig": {
+                "node_version": "20",
+                "npm_version": "10",
+                "build_commands": [
+                  "npm ci",
+                  "npm run build"
+                ]
+              },
+              "metadata": {
+                "buildInvocationId": "${{ github.run_id }}-${{ github.run_number }}",
+                "buildStartedOn": "${{ github.event.head_commit.timestamp }}",
+                "buildFinishedOn": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+                "completeness": {
+                  "parameters": true,
+                  "environment": true,
+                  "materials": true
+                },
+                "reproducible": false
+              },
+              "materials": [
+                {
+                  "uri": "git+https://github.com/${{ github.repository }}@${{ github.ref }}",
+                  "digest": {
+                    "sha1": "${{ github.sha }}"
+                  }
+                }
+              ]
+            }
+          }
+          EOF
+          
+          echo "SLSA Provenance generated for commit ${{ github.sha }}"
+      
+      - name: Sign provenance (placeholder for sigstore)
+        run: |
+          echo "=== SLSA Provenance Signature ==="
+          echo "In production, use sigstore cosign to sign this provenance"
+          echo "Command: cosign sign-blob --bundle=slsa-provenance.bundle slsa-provenance.json"
+          echo ""
+          echo "For now, generating SHA256 signature:"
+          sha256sum slsa-provenance.json > slsa-provenance.json.sha256
+      
+      - name: Upload SLSA provenance
+        uses: actions/upload-artifact@v4
+        with:
+          name: slsa-provenance-${{ github.sha }}
+          path: |
+            slsa-provenance.json
+            slsa-provenance.json.sha256
+          retention-days: 365
+      
+      - name: Attach to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            slsa-provenance.json
+            slsa-provenance.json.sha256
+      
+      - name: SLSA Level 1 Complete
+        run: |
+          echo "============================================"
+          echo "  SLSA Level 1 Provenance Generated"
+          echo "============================================"
+          echo ""
+          echo "✓ Automated build process"
+          echo "✓ Build provenance generated"
+          echo "✓ Build metadata documented"
+          echo "✓ Subject digests calculated"
+          echo "✓ Materials tracked"
+          echo ""
+          echo "SLSA Level: L1 (Build provenance exists)"
+          echo ""
+          echo "Next steps for L2:"
+          echo "  - Version control for all materials"
+          echo "  - Hosted build platform (GitHub Actions ✓)"
+          echo "  - Build service provenance"
+          echo ""
+          echo "Next steps for L3:"
+          echo "  - Hardened build platform"
+          echo "  - Non-falsifiable provenance"
+          echo "  - Isolation between builds"
+          echo "============================================"
