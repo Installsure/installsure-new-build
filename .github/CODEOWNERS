@@ -1,0 +1,236 @@
+# InstallSure Code Ownership - 3-Tier Team Structure
+#
+# This file defines code ownership for the 3-tier collaborative development approach.
+# Each tier (VS Code, Cursor, GitHub Copilot) has specific areas of responsibility.
+#
+# Syntax: <file-pattern> @owner1 @owner2
+# All code changes require review from relevant tier owners.
+
+# ============================================================================
+# Tier 1: Infrastructure & Configuration (VS Code)
+# Responsible for: Build setup, tooling, deployment, database schema
+# ============================================================================
+
+# Root Configuration Files
+/.gitignore                     @tier1-infrastructure
+/docker-compose.yml             @tier1-infrastructure
+/docker-compose.*.yml           @tier1-infrastructure
+/.dockerignore                  @tier1-infrastructure
+/.nvmrc                         @tier1-infrastructure
+/.editorconfig                  @tier1-infrastructure
+
+# Build & Development Scripts
+/scripts/                       @tier1-infrastructure
+/scripts/dev.*                  @tier1-infrastructure
+/scripts/build.*                @tier1-infrastructure
+/scripts/test.*                 @tier1-infrastructure
+/scripts/db-*                   @tier1-infrastructure
+
+# Backend Infrastructure
+/backend/package.json           @tier1-infrastructure
+/backend/package-lock.json      @tier1-infrastructure
+/backend/tsconfig.json          @tier1-infrastructure
+/backend/tsconfig.*.json        @tier1-infrastructure
+/backend/Dockerfile             @tier1-infrastructure
+/backend/.dockerignore          @tier1-infrastructure
+/backend/jest.config.*          @tier1-infrastructure
+/backend/vitest.config.*        @tier1-infrastructure
+/backend/eslint.config.*        @tier1-infrastructure
+/backend/.eslintrc.*            @tier1-infrastructure
+/backend/.prettierrc            @tier1-infrastructure
+/backend/.env.example           @tier1-infrastructure
+/backend/env.example            @tier1-infrastructure
+
+# Database Schema & Migrations
+/backend/prisma/                @tier1-infrastructure
+/backend/prisma/schema.prisma   @tier1-infrastructure
+/backend/prisma/migrations/     @tier1-infrastructure
+
+# Core Infrastructure Libraries
+/backend/src/lib/               @tier1-infrastructure @tier2-implementation
+/backend/src/lib/env.ts         @tier1-infrastructure
+/backend/src/lib/redis.ts       @tier1-infrastructure
+/backend/src/lib/queue.ts       @tier1-infrastructure
+/backend/src/lib/http.ts        @tier1-infrastructure
+/backend/src/lib/logger.ts      @tier1-infrastructure
+/backend/src/config/            @tier1-infrastructure
+/backend/src/infra/             @tier1-infrastructure
+
+# Frontend Infrastructure
+/frontend/package.json          @tier1-infrastructure
+/frontend/package-lock.json     @tier1-infrastructure
+/frontend/tsconfig.json         @tier1-infrastructure
+/frontend/tsconfig.*.json       @tier1-infrastructure
+/frontend/vite.config.ts        @tier1-infrastructure
+/frontend/tailwind.config.*     @tier1-infrastructure
+/frontend/postcss.config.*      @tier1-infrastructure
+/frontend/Dockerfile            @tier1-infrastructure
+/frontend/.dockerignore         @tier1-infrastructure
+/frontend/.env.example          @tier1-infrastructure
+/frontend/index.html            @tier1-infrastructure
+
+# BIM Service Infrastructure
+/bim/requirements.txt           @tier1-infrastructure
+/bim/requirements-dev.txt       @tier1-infrastructure
+/bim/Dockerfile                 @tier1-infrastructure
+/bim/.dockerignore              @tier1-infrastructure
+/bim/.env.example               @tier1-infrastructure
+/bim/pyproject.toml             @tier1-infrastructure
+
+# CI/CD Configuration
+/.github/workflows/             @tier1-infrastructure
+/.github/actions/               @tier1-infrastructure
+/.circleci/                     @tier1-infrastructure
+/.gitlab-ci.yml                 @tier1-infrastructure
+/azure-pipelines.yml            @tier1-infrastructure
+/Jenkinsfile                    @tier1-infrastructure
+
+# ============================================================================
+# Tier 2: Feature Implementation (Cursor)
+# Responsible for: Business logic, API endpoints, UI components, features
+# ============================================================================
+
+# Backend Application Code
+/backend/src/index.ts           @tier2-implementation
+/backend/src/server.ts          @tier2-implementation @tier1-infrastructure
+/backend/src/routes/            @tier2-implementation
+/backend/src/services/          @tier2-implementation
+/backend/src/controllers/       @tier2-implementation
+/backend/src/middleware/        @tier2-implementation
+/backend/src/processors/        @tier2-implementation
+/backend/src/types/             @tier2-implementation
+/backend/src/utils/             @tier2-implementation
+/backend/prisma/seed.ts         @tier2-implementation
+
+# Frontend Application Code
+/frontend/src/                  @tier2-implementation
+/frontend/src/App.tsx           @tier2-implementation
+/frontend/src/main.tsx          @tier2-implementation
+/frontend/src/pages/            @tier2-implementation
+/frontend/src/components/       @tier2-implementation
+/frontend/src/contexts/         @tier2-implementation
+/frontend/src/hooks/            @tier2-implementation
+/frontend/src/utils/            @tier2-implementation
+/frontend/src/types/            @tier2-implementation
+/frontend/src/styles/           @tier2-implementation
+
+# BIM Service Application Code
+/bim/main.py                    @tier2-implementation
+/bim/app/                       @tier2-implementation
+/bim/services/                  @tier2-implementation
+/bim/utils/                     @tier2-implementation
+
+# ============================================================================
+# Tier 3: Quality Assurance & Documentation (GitHub Copilot)
+# Responsible for: Testing, documentation, code review, security
+# ============================================================================
+
+# Documentation Files
+/README.md                      @tier3-quality
+/CONTRIBUTING.md                @tier3-quality
+/TEAM_WORKFLOW.md               @tier3-quality
+/BUILD_GUIDANCE.md              @tier3-quality
+/REVIEW_CHECKLIST.md            @tier3-quality
+/MIGRATION_GUIDE.md             @tier3-quality
+/CHANGELOG.md                   @tier3-quality
+/SECURITY.md                    @tier3-quality
+/LICENSE                        @tier3-quality
+/docs/                          @tier3-quality
+
+# Test Files (All Tiers Review)
+/backend/tests/                 @tier3-quality @tier2-implementation
+/backend/src/**/*.test.ts       @tier3-quality @tier2-implementation
+/backend/src/**/*.spec.ts       @tier3-quality @tier2-implementation
+/frontend/src/**/*.test.tsx     @tier3-quality @tier2-implementation
+/frontend/src/**/*.spec.tsx     @tier3-quality @tier2-implementation
+/bim/tests/                     @tier3-quality @tier2-implementation
+/bim/**/*_test.py               @tier3-quality @tier2-implementation
+
+# Test Configuration
+/backend/tests/setup.ts         @tier3-quality @tier1-infrastructure
+/frontend/src/setupTests.ts     @tier3-quality @tier1-infrastructure
+
+# Code Quality Tools Configuration
+/.prettierrc                    @tier3-quality @tier1-infrastructure
+/.prettierignore                @tier3-quality @tier1-infrastructure
+/.eslintignore                  @tier3-quality @tier1-infrastructure
+
+# Security & Compliance
+/SECURITY.md                    @tier3-quality
+/.github/SECURITY.md            @tier3-quality
+/security/                      @tier3-quality
+
+# Performance & Monitoring
+/backend/src/infra/monitoring.ts @tier3-quality @tier1-infrastructure
+/monitoring/                    @tier3-quality
+
+# ============================================================================
+# Critical Files (All Tiers Must Review)
+# ============================================================================
+
+# Environment Configuration (Sensitive)
+/.env                           @tier1-infrastructure @tier2-implementation @tier3-quality
+/backend/.env                   @tier1-infrastructure @tier2-implementation @tier3-quality
+/frontend/.env                  @tier1-infrastructure @tier2-implementation @tier3-quality
+/bim/.env                       @tier1-infrastructure @tier2-implementation @tier3-quality
+
+# Production Deployment Files
+/Dockerfile                     @tier1-infrastructure @tier3-quality
+/docker-compose.prod.yml        @tier1-infrastructure @tier3-quality
+/kubernetes/                    @tier1-infrastructure @tier3-quality
+/helm/                          @tier1-infrastructure @tier3-quality
+/terraform/                     @tier1-infrastructure @tier3-quality
+
+# Security-Critical Code
+/backend/src/lib/auth.ts        @tier2-implementation @tier3-quality
+/backend/src/middleware/auth.ts @tier2-implementation @tier3-quality
+/backend/src/middleware/security.ts @tier2-implementation @tier3-quality
+
+# ============================================================================
+# Feature-Specific Ownership
+# ============================================================================
+
+# Authentication & Authorization
+/backend/src/routes/auth.ts     @tier2-implementation @tier3-quality
+/backend/src/services/auth.ts   @tier2-implementation @tier3-quality
+/frontend/src/contexts/AuthContext.tsx @tier2-implementation @tier3-quality
+
+# Project Management
+/backend/src/routes/projects.ts @tier2-implementation
+/backend/src/services/projects.ts @tier2-implementation
+/frontend/src/pages/ProjectsPage.tsx @tier2-implementation
+
+# RFI System
+/backend/src/routes/rfis.ts     @tier2-implementation
+/backend/src/services/rfis.ts   @tier2-implementation
+/frontend/src/pages/RFIsPage.tsx @tier2-implementation
+
+# BIM Processing
+/bim/main.py                    @tier2-implementation @tier3-quality
+/backend/src/routes/autocad.ts  @tier2-implementation
+
+# ============================================================================
+# Default Ownership
+# ============================================================================
+
+# Everything else requires review from implementation and quality tiers
+*                               @tier2-implementation @tier3-quality
+
+# ============================================================================
+# Team Member Mapping (Example - Update with actual GitHub usernames)
+# ============================================================================
+# @tier1-infrastructure     = Infrastructure specialists (VS Code focus)
+# @tier2-implementation     = Feature developers (Cursor focus)
+# @tier3-quality           = QA engineers & reviewers (GitHub Copilot focus)
+#
+# To use this file effectively:
+# 1. Replace the tier labels with actual GitHub usernames or teams
+# 2. Ensure all team members have appropriate repository access
+# 3. Configure branch protection rules to require reviews from code owners
+# 4. Regularly review and update ownership as the team evolves
+#
+# Example with actual usernames:
+# @tier1-infrastructure     = @infrastructure-team
+# @tier2-implementation     = @feature-dev-team
+# @tier3-quality           = @qa-team
+# ============================================================================
