@@ -1,0 +1,142 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Dev: Bootstrap",
+      "type": "shell",
+      "command": "make dev",
+      "problemMatcher": [],
+      "detail": "Bootstrap development environment (postgres, redis, backend, bim, frontend)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "LLM: Up & Seed",
+      "type": "shell",
+      "command": "make llm",
+      "problemMatcher": [],
+      "detail": "Start LLM stack (pgvector, migrations, embeddings pipeline)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Test: All",
+      "type": "shell",
+      "command": "make test",
+      "problemMatcher": [],
+      "detail": "Run all tests (pytest, vitest, playwright, evals)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Security: Scan",
+      "type": "shell",
+      "command": "make scan",
+      "problemMatcher": [],
+      "detail": "Run security scans (bandit, SBOM, npm audit)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Seed: Demo Data",
+      "type": "shell",
+      "command": "make seed",
+      "problemMatcher": [],
+      "detail": "Seed database with demo data and sample embeddings",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Build: Release",
+      "type": "shell",
+      "command": "make release",
+      "problemMatcher": [],
+      "detail": "Build production images with SLSA provenance",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Clean: All",
+      "type": "shell",
+      "command": "make clean",
+      "problemMatcher": [],
+      "detail": "Clean up containers, volumes, and build artifacts",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Backend: Dev Server",
+      "type": "shell",
+      "command": "cd backend && npm run dev",
+      "problemMatcher": ["$tsc-watch"],
+      "isBackground": true,
+      "detail": "Start backend dev server with hot reload",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
+    },
+    {
+      "label": "Frontend: Dev Server",
+      "type": "shell",
+      "command": "cd frontend && npm run dev",
+      "problemMatcher": [],
+      "isBackground": true,
+      "detail": "Start frontend dev server with hot reload",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
+    },
+    {
+      "label": "Backend: Tests Watch",
+      "type": "shell",
+      "command": "cd backend && npm run test:watch",
+      "problemMatcher": ["$tsc-watch"],
+      "isBackground": true,
+      "detail": "Run backend tests in watch mode",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Eval: Groundedness",
+      "type": "shell",
+      "command": "cd backend && npx tsx src/evals/groundedness.ts",
+      "problemMatcher": [],
+      "detail": "Run groundedness evaluation",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Eval: Latency",
+      "type": "shell",
+      "command": "cd backend && npx tsx src/evals/latency.ts",
+      "problemMatcher": [],
+      "detail": "Run latency evaluation",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    }
+  ]
+}
