@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures/auth';
+import { test, expect } from './fixtures/auth';
 
 test.describe('Navigation Workflow', () => {
   test('should navigate to all main pages from dashboard', async ({ authenticatedPage: page }) => {

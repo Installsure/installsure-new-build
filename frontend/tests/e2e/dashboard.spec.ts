@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures/auth';
+import { test, expect } from './fixtures/auth';
 
 test.describe('Dashboard Workflow', () => {
   test('should display dashboard after login', async ({ authenticatedPage: page }) => {
