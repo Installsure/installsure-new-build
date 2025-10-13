@@ -1,8 +1,14 @@
 # InstallSure v2.0 - Enterprise Construction Management Platform
 
+[![CI](https://github.com/Installsure/installsure-new-build/actions/workflows/ci.yml/badge.svg)](https://github.com/Installsure/installsure-new-build/actions/workflows/ci.yml)
+[![OWASP ASVS 5.0](https://img.shields.io/badge/OWASP%20ASVS-5.0-blue)](./docs/security/OWASP_ASVS_5.0_Checklist.csv)
+[![SLSA 3](https://img.shields.io/badge/SLSA-Level%203-green)](https://slsa.dev)
+
 ## 🏗️ Complete Build Summary
 
-This is a comprehensive rebuild of InstallSure as an enterprise-grade construction management platform with multi-service architecture.
+This is a comprehensive rebuild of InstallSure as an enterprise-grade construction management platform with multi-service architecture, following the **Golden Path v1.1** framework for secure, tested, and compliant software development.
+
+📖 **[View Golden Path v1.1 Implementation Guide](./docs/GOLDEN_PATH_v1.1.md)**
 
 ## 📋 What's Included
 
@@ -147,26 +153,62 @@ installsure/
 
 ## 🚀 Quick Start
 
+### Using Makefile (Recommended)
+
+```bash
+# Setup environment and install dependencies
+make install
+make setup
+
+# Start all services with Docker
+make docker-up
+
+# Run database migrations and seed demo data
+make migrate
+make seed
+
+# Access the application
+# Frontend: http://localhost:5173
+# Backend API: http://localhost:8080
+# BIM Service: http://localhost:8000
+```
+
+### Using Scripts (Alternative)
+
+**Windows PowerShell:**
+```powershell
+.\scripts\dev.ps1
+```
+
+**Linux/Mac:**
+```bash
+./scripts/dev.sh
+```
+
+### Manual Setup
+
 1. **Environment Setup**:
    ```bash
    # Copy environment files
    cp backend/.env.example backend/.env
    cp bim/.env.example bim/.env
+   cp frontend/.env.example frontend/.env
    ```
 
-2. **Development Mode**:
+2. **Install Dependencies**:
    ```bash
-   # Windows PowerShell
-   .\scripts\dev.ps1
-   
-   # Linux/Mac
-   ./scripts/dev.sh
+   cd backend && npm install
+   cd ../frontend && npm install
+   cd ../bim && pip install -r requirements.txt
    ```
 
-3. **Access the Application**:
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:8080
-   - BIM Service: http://localhost:8000
+3. **Start Services**:
+   ```bash
+   docker-compose up -d postgres redis
+   cd backend && npm run dev &
+   cd frontend && npm run dev &
+   cd bim && uvicorn main:app --reload
+   ```
 
 ## 📊 API Endpoints
 
@@ -246,8 +288,151 @@ installsure/
 - Connection pooling
 - Efficient file handling
 
+## 🧪 Testing & Quality
+
+### Running Tests
+
+```bash
+# Run all tests
+make test
+
+# Run tests by service
+make test-backend
+make test-frontend
+make test-bim
+
+# Run E2E tests
+make test-e2e
+
+# Generate coverage report
+make test-coverage
+```
+
+### Quality Gates
+
+All pull requests must pass:
+- ✅ Unit tests with ≥80% coverage
+- ✅ Integration tests
+- ✅ E2E tests (Playwright)
+- ✅ Linting (ESLint, Ruff, Prettier, Black)
+- ✅ Type checking (TypeScript, mypy)
+- ✅ Security scanning (Bandit, npm audit)
+- ✅ OWASP ASVS 5.0 verification
+
+### Pre-commit Hooks
+
+Install pre-commit hooks to ensure code quality:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+Hooks include:
+- Code formatting (Black, Prettier, isort)
+- Linting (Ruff, ESLint)
+- Type checking (mypy)
+- Security scanning (Bandit, detect-secrets)
+- Documentation linting (markdownlint)
+
+## 🔒 Security & Compliance
+
+### OWASP ASVS 5.0
+
+InstallSure implements >80% of OWASP Application Security Verification Standard 5.0 controls.
+
+See [OWASP ASVS Checklist](./docs/security/OWASP_ASVS_5.0_Checklist.csv) for details.
+
+### SLSA Supply Chain Security
+
+- **Level 3**: Non-falsifiable provenance
+- Signed artifacts on every release
+- SBOM (Software Bill of Materials) included
+- Dependency scanning with Dependabot
+
+### Security Features Summary
+
+- JWT-based authentication with refresh tokens
+- Role-based access control (RBAC)
+- Rate limiting and DDoS protection
+- Input validation and sanitization
+- SQL injection prevention (ORM)
+- XSS protection (React auto-escaping)
+- CSRF protection (SameSite cookies)
+- Secure headers (Helmet middleware)
+- TLS/HTTPS enforcement
+- File upload validation and scanning hooks
+- Secrets management (environment variables)
+- Audit logging for sensitive operations
+
+## 🛠️ Development
+
+### Available Commands
+
+```bash
+# Development
+make dev              # Start all services
+make dev-backend      # Start backend only
+make dev-frontend     # Start frontend only
+make dev-bim          # Start BIM worker only
+
+# Testing
+make test             # Run all tests
+make test-coverage    # Test with coverage report
+make test-e2e         # Run E2E tests
+
+# Quality & Security
+make lint             # Run all linters
+make lint-fix         # Auto-fix linting issues
+make format           # Format all code
+make typecheck        # Run type checkers
+make security         # Run security scans
+
+# Database
+make migrate          # Run database migrations
+make seed             # Seed demo data
+make db-reset         # Reset database
+
+# Docker
+make docker-up        # Start Docker services
+make docker-down      # Stop Docker services
+make docker-build     # Build Docker images
+make docker-logs      # View logs
+
+# Build & Deploy
+make build            # Build for production
+make clean            # Clean build artifacts
+make sbom             # Generate SBOM
+```
+
+See `Makefile` for all available commands.
+
+## 📚 Documentation
+
+- [Golden Path v1.1 Implementation Guide](./docs/GOLDEN_PATH_v1.1.md) - Complete development framework
+- [OWASP ASVS 5.0 Checklist](./docs/security/OWASP_ASVS_5.0_Checklist.csv) - Security compliance tracker
+- [Migration Guide](./MIGRATION_GUIDE.md) - Repository migration instructions
+
+## 🤝 Contributing
+
+1. Create a feature branch from `main`
+2. Make your changes
+3. Run tests and linting: `make test && make lint`
+4. Commit with conventional commit messages
+5. Push and open a pull request
+6. Wait for CI checks to pass
+7. Request review from maintainers
+
+All contributions must pass CI gates including:
+- Tests with ≥80% coverage
+- Security scans
+- Code quality checks
+- OWASP ASVS verification
+
 ---
 
-**Status**: ✅ Complete multi-service enterprise construction management platform
-**Version**: 2.0.0
+**Status**: ✅ Complete multi-service enterprise construction management platform  
+**Version**: 2.0.0  
+**Golden Path**: v1.1 ✅  
+**SLSA Level**: 3  
 **Last Updated**: October 2025
