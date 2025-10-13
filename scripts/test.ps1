@@ -36,6 +36,9 @@ Write-Host "⚛️ Testing frontend..." -ForegroundColor Magenta
 Set-Location ../frontend
 npm install
 
+Write-Host "Installing Playwright browsers..." -ForegroundColor Cyan
+npx playwright install --with-deps chromium
+
 Write-Host "Running component tests..." -ForegroundColor Cyan
 npm test
 
