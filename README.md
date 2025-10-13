@@ -168,6 +168,17 @@ installsure/
    - Backend API: http://localhost:8080
    - BIM Service: http://localhost:8000
 
+4. **Running Tests**:
+   ```bash
+   # Frontend E2E tests
+   cd frontend
+   npm install
+   npm run test:e2e
+   
+   # Note: npx playwright install can be skipped as the config uses system Chrome
+   # If you want to install Playwright browsers: npx playwright install
+   ```
+
 ## 📊 API Endpoints
 
 ### Authentication
@@ -245,6 +256,31 @@ installsure/
 - Database indexing and optimization
 - Connection pooling
 - Efficient file handling
+
+## 🧪 Testing
+
+### Frontend Testing
+The frontend includes both unit tests (Vitest) and end-to-end tests (Playwright):
+
+#### Unit Tests
+```bash
+cd frontend
+npm test                    # Run unit tests
+npm run test:coverage       # Generate coverage report
+```
+
+#### E2E Tests
+```bash
+cd frontend
+npm run test:e2e            # Run Playwright E2E tests
+```
+
+The E2E test suite includes:
+- Homepage and navigation tests
+- Authentication flow tests
+- Form validation tests
+
+**Note**: The Playwright configuration uses system Chrome browser, so `npx playwright install` is optional.
 
 ---
 
