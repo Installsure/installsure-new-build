@@ -11,7 +11,7 @@ import type {
   QBHealthResponse,
 } from "../types/api.js";
 
-const API_BASE =
+export const API_BASE =
   (import.meta as any).env?.VITE_API_BASE || "http://localhost:8000";
 
 export interface ApiError {
@@ -148,8 +148,51 @@ export class ApiClient {
 
   async deleteFile(id: string) {
     return this.request(`/api/files/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
     });
+  }
+
+  // Plans
+  async uploadPlan(
+    file: File,
+    options: { projectId?: string; uploadedById?: string } = {},
+    onProgress?: (event: ProgressEvent) => void,
+  ): Promise<import('../hooks/useFileUpload.js').PlanFile> {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (options.projectId) formData.append('projectId', options.projectId);
+    if (options.uploadedById) formData.append('uploadedById', options.uploadedById);
+
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${this.baseUrl}/api/plans/upload`);
+
+      if (onProgress) {
+        xhr.upload.onprogress = onProgress;
+      }
+
+      xhr.onload = () => {
+        try {
+          const body = JSON.parse(xhr.responseText);
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(body);
+          } else {
+            const err: any = new Error(body?.error || `HTTP ${xhr.status}`);
+            err.status = xhr.status;
+            reject(err);
+          }
+        } catch {
+          reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));
+        }
+      };
+
+      xhr.onerror = () => reject(new Error('Network error'));
+      xhr.send(formData);
+    });
+  }
+
+  async getPlan(id: string): Promise<import('../hooks/useFileUpload.js').PlanFile> {
+    return this.request(`/api/plans/${id}`);
   }
 
   // Forge/AutoCAD

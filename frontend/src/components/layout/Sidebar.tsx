@@ -6,7 +6,8 @@ import {
   MessageSquare, 
   CheckSquare, 
   Calendar, 
-  Files, 
+  Files,
+  FileImage,
   Settings 
 } from 'lucide-react';
 
@@ -17,6 +18,7 @@ const navigation = [
   { name: 'Tasks', href: '/tasks', icon: CheckSquare },
   { name: 'Calendar', href: '/calendar', icon: Calendar },
   { name: 'Files', href: '/files', icon: Files },
+  { name: 'Plans', href: '/plans', icon: FileImage },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 

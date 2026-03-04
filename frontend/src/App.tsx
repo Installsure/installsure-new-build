@@ -16,6 +16,7 @@ import TasksPage from './pages/TasksPage';
 import CalendarPage from './pages/CalendarPage';
 import FilesPage from './pages/FilesPage';
 import SettingsPage from './pages/SettingsPage';
+import PlansPage from './pages/PlansPage';
 
 // Components
 import Navbar from './components/layout/Navbar';
@@ -115,6 +116,14 @@ function AppRoutes() {
         <ProtectedRoute>
           <AppLayout>
             <FilesPage />
+          </AppLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/plans" element={
+        <ProtectedRoute>
+          <AppLayout>
+            <PlansPage />
           </AppLayout>
         </ProtectedRoute>
       } />

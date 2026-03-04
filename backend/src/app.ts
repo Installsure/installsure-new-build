@@ -12,6 +12,7 @@ import projectRoutes from './api/routes/projects.js';
 import fileRoutes from './api/routes/files.js';
 import forgeRoutes from './api/routes/forge.js';
 import qbRoutes from './api/routes/qb.js';
+import plansRoutes from './api/routes/plans.js';
 
 export const createApp = (): express.Application => {
   const app = express();
@@ -30,6 +31,7 @@ export const createApp = (): express.Application => {
   app.use('/api/auth', authRoutes);
   app.use('/api/projects', projectRoutes);
   app.use('/api/files', fileRoutes);
+  app.use('/api/plans', plansRoutes);
   app.use('/api/autocad', forgeRoutes);
   app.use('/api/qb', qbRoutes);
 

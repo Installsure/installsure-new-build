@@ -466,7 +466,7 @@ server.post('/projects/:projectId/plans/upload', {
   const crypto = await import('crypto');
   
   const buffer = await data.toBuffer();
-  const hash = crypto.createHash('md5').update(buffer).digest('hex');
+  const hash = crypto.createHash('sha256').update(buffer).digest('hex');
   const uploadPath = process.env.UPLOAD_PATH || './uploads';
   const filename = `${hash}${path.extname(data.filename)}`;
   const filepath = path.join(uploadPath, 'plans', filename);
@@ -481,7 +481,7 @@ server.post('/projects/:projectId/plans/upload', {
       type: data.mimetype.includes('ifc') ? 'IFC' : 
             data.mimetype.includes('pdf') ? 'PDF' : 'IMAGE',
       path: filepath,
-      fileHash: hash,
+      checksum: hash,
       size: buffer.length,
       mimeType: data.mimetype
     }
