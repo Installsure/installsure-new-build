@@ -105,6 +105,7 @@ export function validateExtension(filename: string): string {
  * `requiredBytes + DISK_SPACE_BUFFER_BYTES` of free space.
  */
 export async function validateDiskSpace(requiredBytes: number): Promise<void> {
+  interface StatFsStats { bavail: number; bsize: number; }
   try {
     const statfs = (fsSync as any).statfs;
     if (typeof statfs !== 'function') {
@@ -112,8 +113,8 @@ export async function validateDiskSpace(requiredBytes: number): Promise<void> {
       logger.warn('fs.statfs not available – skipping disk space check');
       return;
     }
-    const stats = await new Promise<{ bavail: number; bsize: number }>((resolve, reject) => {
-      statfs(UPLOAD_DIR, (err: NodeJS.ErrnoException | null, stats: any) => {
+    const stats = await new Promise<StatFsStats>((resolve, reject) => {
+      statfs(UPLOAD_DIR, (err: NodeJS.ErrnoException | null, stats: StatFsStats) => {
         if (err) reject(err);
         else resolve(stats);
       });

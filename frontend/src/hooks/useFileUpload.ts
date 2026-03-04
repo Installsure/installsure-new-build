@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useUploadProgress, UploadProgress } from './useUploadProgress.js';
-
-const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:8000';
+import { API_BASE } from '../lib/api.js';
 
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 1000;

@@ -67,16 +67,21 @@ router.post(
       size: req.file.size,
     });
 
+    // Read the uploaded file into memory, then remove the temp file
     let fileBuffer: Buffer;
     try {
       fileBuffer = await fsPromises.readFile(req.file.path);
     } catch (err) {
+      // Clean up and report error
+      fsPromises.unlink(req.file.path).catch(() => {});
       childLogger.error({ error: (err as Error).message }, 'Failed to read uploaded file from disk');
       return res.status(500).json({ error: 'Failed to process uploaded file' });
-    } finally {
-      // Always clean up the temp file from disk
-      fsPromises.unlink(req.file.path).catch(() => {});
     }
+
+    // Clean up the temp file after a successful read (fire-and-forget)
+    fsPromises.unlink(req.file.path).catch((err) => {
+      childLogger.warn({ error: (err as Error).message }, 'Failed to clean up temp upload file');
+    });
 
     const projectId = typeof req.body?.projectId === 'string' ? req.body.projectId : undefined;
     const uploadedById = typeof req.body?.uploadedById === 'string' ? req.body.uploadedById : undefined;

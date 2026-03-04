@@ -11,7 +11,7 @@ import type {
   QBHealthResponse,
 } from "../types/api.js";
 
-const API_BASE =
+export const API_BASE =
   (import.meta as any).env?.VITE_API_BASE || "http://localhost:8000";
 
 export interface ApiError {

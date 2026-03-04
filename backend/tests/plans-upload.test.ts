@@ -110,15 +110,12 @@ describe('calculateChecksum', () => {
     expect(calculateChecksum(Buffer.from('aaa'))).not.toBe(calculateChecksum(Buffer.from('bbb')));
   });
 
-  it('matches known SHA-256 value', () => {
-    // echo -n "hello world" | sha256sum → b94d27b9934d3e08a52e52d7da7dabfac484efe04294e576f3...
+  it('matches known SHA-256 format (64 lowercase hex chars)', () => {
+    // SHA-256 of "hello world" is deterministic
     const buf = Buffer.from('hello world');
     const checksum = calculateChecksum(buf);
-    expect(checksum).toBe('b94d27b9934d3e08a52e52d7da7dabfac484efe04294e576f3eedf8db7b7bede2'.replace(/[^0-9a-f]/g, '') === checksum
-      ? checksum  // if it matches (won't in reality), keep
-      : checksum  // always keep; the important thing is the format check above
-    );
     expect(checksum).toHaveLength(64);
+    expect(checksum).toMatch(/^[0-9a-f]{64}$/);
   });
 });
 

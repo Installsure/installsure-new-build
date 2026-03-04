@@ -98,8 +98,9 @@ check_upload_errors() {
 
   if [ -f "$log_path" ]; then
     # Count error-level entries from the last 5 minutes containing 'plans-upload'
+    # Compute epoch for 5 minutes ago in a portable way
     local since
-    since=$(date -d '5 minutes ago' '+%s' 2>/dev/null || date -v-5M '+%s' 2>/dev/null || echo "0")
+    since=$(( $(date +%s) - 300 ))
     error_count=$(awk -v since="$since" '
       /plans-upload/ && /"level":50/ {
         match($0, /"time":([0-9]+)/, arr)

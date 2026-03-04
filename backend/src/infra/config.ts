@@ -33,7 +33,7 @@ const configSchema = z.object({
   AUTH_SECRET: z.string().min(32, 'AUTH_SECRET must be at least 32 characters'),
   JWT_EXPIRES_IN: z.string().default('24h'),
   // Plans upload
-  PLANS_MAX_FILE_SIZE: z.coerce.number().default(500 * 1024 * 1024), // 500 MB
+  PLANS_MAX_FILE_SIZE: z.coerce.number().default(500 * 1024 * 1024), // 500 MB – 500 * 1024 * 1024
   PLANS_UPLOAD_DIR: z.string().default('./uploads/plans'),
   PLANS_RETRY_MAX_ATTEMPTS: z.coerce.number().default(3),
   PLANS_RETRY_BASE_DELAY_MS: z.coerce.number().default(500),
