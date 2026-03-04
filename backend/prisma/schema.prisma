@@ -79,22 +79,27 @@ model ProjectMember {
 }
 
 model PlanFile {
-  id          String   @id @default(cuid())
-  projectId   String
-  name        String
-  type        FileType
-  path        String
-  fileHash    String   @unique
-  size        Int
-  mimeType    String
-  metadata    Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  projectId     String?
+  uploadedById  String?
+  name          String
+  type          FileType
+  path          String
+  checksum      String   @unique
+  size          Int
+  mimeType      String
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Relations
-  project Project @relation(fields: [projectId], references: [id])
-  tags    Tag[]
+  project  Project? @relation(fields: [projectId], references: [id])
+  tags     Tag[]
 
+  @@index([checksum])
+  @@index([projectId])
+  @@index([uploadedById])
+  @@index([createdAt])
   @@map("plan_files")
 }
 

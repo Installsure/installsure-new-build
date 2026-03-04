@@ -4,6 +4,7 @@ import { logger } from '../infra/logger.js';
 import { File, CreateFileData } from '../types/files.js';
 import { createError } from '../api/middleware/errorHandler.js';
 import { allowedFileTypes } from '../api/schemas/common.js';
+import { calculateChecksum } from './plansUploadService.js';
 import path from 'path';
 import { promises as fs } from 'fs';
 
@@ -82,6 +83,10 @@ export class FilesService {
 
       // Read file buffer
       const fileBuffer = await fs.readFile(file.path);
+
+      // Calculate SHA-256 checksum for integrity
+      const checksum = calculateChecksum(fileBuffer);
+      childLogger.debug({ checksum }, 'File checksum calculated');
 
       // Upload to storage
       const storageResult = await storage.upload(fileBuffer, fileKey);
